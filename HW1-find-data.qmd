@@ -1,0 +1,8 @@
+---
+title: "link"
+format: html
+---
+
+https://search.dataone.org/view/https%3A%2F%2Fpasta.lternet.edu%2Fpackage%2Fmetadata%2Feml%2Fedi%2F244%2F13 
+
+https://portal.edirepository.org/nis/mapbrowse?scope=edi&identifier=244 

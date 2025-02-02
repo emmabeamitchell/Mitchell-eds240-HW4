@@ -1,0 +1,107 @@
+---
+title: "HW 2 Data Exploration"
+author: "Emma Bea Mitchell"
+format: html
+editor_options: 
+  chunk_output_type: console
+---
+
+read in libraries
+```{r}
+library(tidyverse)
+library(here)
+library(janitor)
+```
+
+read in data
+```{r}
+fish_02_24 <- read_csv(here("data", "2002-2024_DJFMP_trawl_fish_and_water_quality_data.csv"))
+locals <- read_csv(here("data", "DJFMP_Site_Locations.csv"))
+```
+
+initial exploration of data
+```{r}
+colnames(fish_02_24)
+
+sum(is.na(fish_02_24))
+
+sum(is.na(fish_02_24$SpecialStudy))
+
+nrow(fish_02_24)
+
+#SpecialStudy has 743,258 NAs out of 759,703 entries (97 percent)
+```
+
+
+```{r}
+unique(fish_02_24$Location)
+unique(fish_02_24$RegionCode)
+unique(fish_02_24$CommonName)
+```
+
+potential questions
+
+How does habitat disturbance influence amount of fish recorded at a site? (compare habitat disturbance to total observations)
+Is there a pattern between fish type and habitat? 
+
+new potential question: have the number of fish recordings changed over time?
+
+clean data
+```{r}
+fish_clean <- fish_02_24 |> 
+  clean_names() |> 
+  select_if(~ sum(is.na(.)) < 750000)
+
+  
+```
+
+wrangle data
+```{r}
+fish_wrangle <- fish_clean |> 
+  group_by(iep_fish_code) |> 
+  summarize(mean_water_temp = mean(water_temp)) |> 
+  na.omit() |> 
+  mutate(iep_fish_code = fct_reorder(iep_fish_code, mean_water_temp))
+
+```
+
+
+visualizations
+```{r}
+viz_1 <- ggplot(fish_wrangle, aes(x = iep_fish_code, y = mean_water_temp)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Average Water Temperature When Fish Caught",
+    y = "average water temperature",
+    x = "IEP fish codes"
+  )
+
+print(viz_1)
+```
+
+```{r}
+chinook <- fish_clean |> 
+  filter(common_name == "Chinook Salmon")
+
+
+```
+
+```{r}
+
+ggplot(chinook, aes(x = fork_length)) +
+  geom_density() +
+  labs(
+    title = "Density of Fish Length Observations",
+    x = "length of fish\n(point of mouth to fork of caudal fin)"
+  )
+
+
+
+```
+
+```{r}
+ggplot(fish_clean, aes(x = location, y = fork_length)) +
+  geom_col()
+```
+

@@ -4,10 +4,18 @@ author: "Emma Bea Mitchell"
 format: html
 editor_options: 
   chunk_output_type: console
+execute: 
+  warning: false
+  message: false
+  echo: true
+  eval: true
 ---
 
 read in libraries
 ```{r}
+#| output: false
+#| quiet: true
+
 library(tidyverse)
 library(here)
 library(janitor)
@@ -15,28 +23,31 @@ library(janitor)
 
 read in data
 ```{r}
+#| output: false
+#| quiet: true
+
 fish_02_24 <- read_csv(here("data", "2002-2024_DJFMP_trawl_fish_and_water_quality_data.csv"))
 locals <- read_csv(here("data", "DJFMP_Site_Locations.csv"))
 ```
 
 initial exploration of data
 ```{r}
-colnames(fish_02_24)
+print(colnames(fish_02_24))
 
-sum(is.na(fish_02_24))
+print(sum(is.na(fish_02_24)))
 
-sum(is.na(fish_02_24$SpecialStudy))
+print(sum(is.na(fish_02_24$SpecialStudy)))
 
-nrow(fish_02_24)
+print(nrow(fish_02_24))
 
 #SpecialStudy has 743,258 NAs out of 759,703 entries (97 percent)
 ```
 
 
 ```{r}
-unique(fish_02_24$Location)
-unique(fish_02_24$RegionCode)
-unique(fish_02_24$CommonName)
+print(unique(fish_02_24$Location))
+print(unique(fish_02_24$RegionCode))
+print(unique(fish_02_24$CommonName))
 ```
 
 potential questions
@@ -89,19 +100,52 @@ chinook <- fish_clean |>
 
 ```{r}
 
-ggplot(chinook, aes(x = fork_length)) +
+plot_1 <- ggplot(chinook, aes(x = fork_length)) +
   geom_density() +
   labs(
     title = "Density of Fish Length Observations",
     x = "length of fish\n(point of mouth to fork of caudal fin)"
   )
 
-
+print(plot_1)
 
 ```
 
 ```{r}
-ggplot(fish_clean, aes(x = location, y = fork_length)) +
-  geom_col()
+plot_2 <- ggplot(fish_clean, aes(x = location, y = fork_length)) +
+  geom_col() +
+  labs(
+    title = "Length of Fish by Location",
+    x = "Location",
+    y = "Length of fish"
+  )
+
+print(plot_2)
 ```
 
+```{r}
+plot_3 <- ggplot(chinook, aes(x = water_temp, y = secchi, na.rm = TRUE)) +
+  geom_point()
+
+print(plot_3)
+```
+
+
+1. What have you learned about your data? Have any potentially interesting patterns emerged?
+
+I have discovered that there are a lot of NAs in my data, but luckily it's also fairly clean and the metadata is really good. I did some cleaning, but will definitely need to do more when I decide what variables I'm interested in. No obvious patterns have emerged, but I think that the potential to look at different locations and different fish/catch types could be really cool. 
+
+2. In HW #1, you outlined some questions that you wanted to answer using these data. Have you made any strides towards answering those questions? If yes, how so? If no, what next steps do you need to take (e.g. I need to create X plot type, I still need to track down Y data, I need to restructure existing data so that you can visualize it in Z ways, etc.)?
+
+potential questions:
+
+How does habitat disturbance influence amount of fish recorded at a site? (compare habitat disturbance to total observations)
+Is there a pattern between fish type and habitat? 
+
+new potential question: have the number of fish recordings changed over time?
+
+In the description of the data it mentioned habitat disturbance, but I haven't seen that in the data set, I need to dig into the metadata some more to work on my first potential question. The second question is pretty easy to answer, although my data set is huge, so I need to work on making my visualizations legible. 
+
+3. What challenges do you foresee encountering with your data? These can be data wrangling and  or visualization 
+
+I expect to have challenges with all my NAs and also with all my data points. I want to still have interesting data left, but in some cases the vast majority of some columns are NAs. I need to dig into them to see if it's worth salvaging or if I should just remove those columns all together. I also have so many data points, that the visualization might be a bit difficult, especially as I personally prefer the look of simpler and easier to understand infographics. 

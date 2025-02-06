@@ -1,14 +1,10 @@
 ---
-title: "HW 2 Data Exploration"
+title: "HW 2 Exploration"
 author: "Emma Bea Mitchell"
-format: html
-editor_options: 
-  chunk_output_type: console
-execute: 
-  warning: false
-  message: false
-  echo: true
-  eval: true
+date: 2025-02-06
+format:
+  html:
+    embed-resources: true # this ensures that your rendered .html file is self-contained, so we (your instructors) can open it and view all your work
 ---
 
 read in libraries

@@ -1,0 +1,70 @@
+---
+title: "HW 3"
+author: "Emma Bea Mitchell"
+format: html
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(tidyverse)
+library(here)
+library(janitor)
+```
+
+```{r}
+fish_02_24 <- read_csv(here("data", "2002-2024_DJFMP_trawl_fish_and_water_quality_data.csv"))
+locals <- read_csv(here("data", "DJFMP_Site_Locations.csv"))
+```
+
+```{r}
+fish_clean <- fish_02_24 |> 
+  clean_names() |> 
+  select_if(~ sum(is.na(.)) < 750000)
+```
+
+
+1. I plan to pursue option 1
+
+2. My questions have changed. They are now:
+
+Overarching questions: 
+Have fish/organism catches at each site changed over time?
+
+Sub-questions: 
+What is the most caught organism at each site over time?
+What is the amount of unique catch types of organisms over time by site?
+What are the abiotic differences between each site? (water temp, weather, location, etc)
+
+
+3. Variables needed for each question
+
+question 1: What is the most caught organism at each site over time?
+
+From the raw data from `fish_02_24` I created a cleaned data set that changed all column names to lower snake case and got rid of any columns with over 750,000 NAs (too many NAs to be a helpful metric to use). From the cleaned dataset, `fish_clean`, I will use the variable `sample_date`, which will give me the time element. I will also use the variable `common_name` (or `iep_fish_code` if I want shorter labels). Lastly, I will use the `location` column to group the catches by site. 
+
+question 2: What is the amount of unique catch types of organisms over time by site?
+
+This question will use the same variables as the last question, `sample_date`, `location`, and `common_name` (or `iep_fish_code`), but used differently. Instead of looking at the "mode" (the most observed organism at each site), we will instead focus on organism type, where the amount of observations doesn't matter. We will simply be looking at the unique names of organisms observed at each site. 
+
+question 3: What are the abiotic differences between each site? 
+
+For this question we will use the `location`, `water_temp`, and `weather_code` from the `fish_clean` dataset. I will also use the `locals` dataset to look at `longitude` and `latitude` in order to compare site locations. I plan to use the lat and long to create a very simple map showing site locations relative to eachother. 
+
+
+4. Data visualization inspiration 
+
+![plot of wind turbine densities in Canada, but shaped like canada and using the colors of the flag](images/Screenshot_map.png)
+Potential idea for displaying abiotic features. I like the idea of using a map of the site or of the bay area in general to show average water temperature, weather, and to also represent location. Would need to play around with how to implement this idea, but could be fun 
+
+
+![stacked bar plot](images/Screenshot_bar.png)
+
+Possible inspo for max organism caught by site over time. I think a stacked barplot could be cool if I find that the organisms have a little bit of consistency and aren't differing completely each year. I think each site could be on the x axis and time could be on the y. I liked this chart specifically because it showed the information in a both aesthetic and helpful way.
+
+
+
+
+
+
+

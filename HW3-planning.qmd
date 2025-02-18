@@ -106,9 +106,9 @@ fish_result <- fish_max |>
     common_name %in% c("Comb jelly", "Estuarine jellyfish", "Crangon sp.", "unid fish", "Bass unknown", "Lamprey unknown", "No catch") ~ "Other",
     TRUE ~ "Other"
   )) 
-# mutate(sample_date = as.Date(sample_date, format = "%Y-%d-%m"))
+ # mutate(sample_date = as.Date(sample_date, format = "%m, %d, %y"))
    
-
+fish_result$sample_date = as.Date(fish_result$sample_date, format = "%m, %d, %y") 
 
 ```
 
@@ -132,9 +132,12 @@ x = site
 ```{r}
 
 ggplot(data = fish_result, aes(x = location, y = sample_date, fill = max_catch_fam)) +
-  geom_col() + 
+  geom_col() +
   scale_x_discrete(expand = c(0,NA)) +
-  scale_y_date(expand = c(0,NA)) +
+   scale_y_date(#expand = as.Date(c('2002','2025')), 
+                date_breaks = "1 year", 
+             limits = as.Date(c('2002-01-02', '2024-07-31')), 
+                label = year) +
   scale_fill_manual(values = my_palette) +
   labs(
     title = "Most Caught Organisms by Sample Date",
@@ -156,30 +159,39 @@ ggplot(data = fish_result, aes(x = location, y = sample_date, fill = max_catch_f
 # make a reprex for my error issue!
 
 ```{r}
-library(reprex)
 
 fish_clean_reprex <- data.frame(location = c("A", "A", "B", "B"),
                          sample_date = c("01/01/2020", "01/01/2020", "02/01/2020", "02/01/2020"),
                          common_name = c("American Shad", "Striped Bass", "Delta Smelt", "Pacific Herring"))
 
-fish_max_reprex <- fish_clean_reprex |> 
-  mutate(sample_date = mdy(sample_date)) |> 
-  group_by(location, sample_date, common_name) |> 
-  summarize(max_catch = n(), .groups = "drop")
 
-fish_top_reprex <- fish_max_reprex |> 
-  group_by(location, sample_date) |> 
+fish_max_reprex <- fish_clean_reprex |>
+  mutate(sample_date = mdy(sample_date)) |>
+  group_by(location, sample_date, common_name) |>
+  summarize(max_catch = n(), .groups = "drop")
+ 
+fish_top_reprex <- fish_max_reprex |>
+  group_by(location, sample_date) |>
   summarize(highest_total = max(max_catch), .groups = "drop")
 
-fish_result_reprex <- fish_max_reprex |> 
-  inner_join(fish_top_reprex, by = c("location", "sample_date", "max_catch" = "highest_total")) |> 
+fish_result_reprex <- fish_max_reprex |>
+  inner_join(fish_top_reprex, by = c("location", "sample_date", "max_catch" = "highest_total")) |>
   mutate(max_catch_fam = case_when(
     common_name %in% c("American Shad", "Delta Smelt", "Pacific Herring") ~ "Fish",
     common_name %in% c("Striped Bass") ~ "Bass"))
 
 ggplot(data = fish_result_reprex, aes(x = location, y = sample_date, fill = max_catch_fam)) +
   geom_col() +
-  scale_y_date(expand = c(0,NA), date_breaks = "1 month")
+  scale_y_date(date_breaks = "1 day", limits = as.Date(c("2020-01-01", "2020-01-02"))) +
+    scale_x_discrete(expand = c(0,NA)) +
+  scale_fill_manual(values = my_palette) +
+  labs(
+    title = "Most Caught Organisms by Sample Date",
+    subtitle = "Organism is Categorized by Family",
+    y = "Sample Date",
+    x = "Sample Location"
+  ) +
+  theme_bw()
 
 
 

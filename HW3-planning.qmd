@@ -65,6 +65,91 @@ Possible inspo for max organism caught by site over time. I think a stacked barp
 
 
 
+# example plot
 
+stacked bar plot 
+y = time
+x = max catch
+
+
+data wrangling
+
+```{r}
+unique(fish_clean$location)
+class(fish_clean$sample_date)
+
+# Step 1: Calculate the catch count for each common_name
+fish_max <- fish_clean |> 
+  drop_na(sample_date) |> 
+  mutate(sample_date = mdy(sample_date)) |> 
+  group_by(location, sample_date, common_name) |> 
+  summarize(max_catch = n(), .groups = "drop")
+
+# Step 2: Find the highest catch for each sample_date and location
+fish_top <- fish_max |> 
+  group_by(location, sample_date) |> 
+  summarize(highest_total = max(max_catch), .groups = "drop")
+
+# Step 3: Join the results to get the common_name with the highest catch
+fish_result <- fish_max |> 
+  inner_join(fish_top, by = c("location", "sample_date", "max_catch" = "highest_total")) |> 
+  mutate(max_catch_fam = case_when(
+    common_name %in% c("American Shad", "Threadfin Shad", "Pacific Herring") ~ "Clupeidae",
+    common_name %in% c("Striped Bass") ~ "Moronidae",
+    common_name %in% c("Longfin Smelt", "Delta Smelt", "Wakasagi") ~ "Osmeridae",
+    common_name %in% c("Steelhead", "Chinook Salmon") ~ "Salmonidae",
+    common_name %in% c("Starry Flounder") ~ "Bothidae",
+    common_name %in% c("Golden Shiner", "Common Carp", "Red Shiner", "Sacramento Pikeminnow", "Splittail") ~ "Cyprinidae",
+    common_name %in% c("Bluegill", "Redear Sunfish", "Black Crappie", "White Crappie", "Spotted Bass") ~ "Centrarchidae",
+    common_name %in% c("Channel Catfish", "White Catfish") ~ "Ictaluridae",
+    common_name %in% c("Northern Anchovy") ~ "Engraulidae",
+    common_name %in% c("Pacific Lamprey", "River Lamprey") ~ "Petromyzontidae",
+    common_name %in% c("Shokihaze Goby", "Shimofuri Goby") ~ "Gobionellidae",
+    common_name %in% c("Mississippi Silverside", "Topsmelt") ~ "Atherinopsidae",
+    common_name %in% c("Siberian prawn") ~ "Palaemonidae",
+    common_name %in% c("Comb jelly", "Estuarine jellyfish", "Crangon sp.", "unid fish", "Bass unknown", "Lamprey unknown", "No catch") ~ "Other",
+    TRUE ~ "Other"
+  )) |> 
+# mutate(sample_date = as.Date(sample_date, format = "%Y-%d-%m"))
+   mutate(sample_date = parse_date_time(sample_date, orders = c("mdy", "dmy", "ymd", "my", "dmy"))) |> 
+  mutate(sample_date = as.Date(sample_date))
+
+
+```
+
+
+visualize
+
+stacked bar plot 
+y = time
+x = site
+
+```{r}
+
+ggplot(data = fish_result, aes(x = location, y = sample_date, fill = max_catch_fam)) +
+  geom_col() + 
+  scale_x_discrete(expand = c(0,NA)) +
+  scale_y_date(expand = c(0, NA), date_breaks = "2 months") +
+  labs(
+    title = "Most Caught Organisms by Sample Date",
+    subtitle = "Organism is Categorized by Family",
+    y = "Sample Date",
+    x = "Sample Location"
+  ) +
+  theme_bw() 
+  
+  
+
+
+
+
+```
+
+
+### code not working, attempt a reprex 
+
+```{r}
+
+```
 
 

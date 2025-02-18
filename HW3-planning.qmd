@@ -67,10 +67,6 @@ Possible inspo for max organism caught by site over time. I think a stacked barp
 
 # example plot
 
-stacked bar plot 
-y = time
-x = max catch
-
 
 data wrangling
 
@@ -109,13 +105,22 @@ fish_result <- fish_max |>
     common_name %in% c("Siberian prawn") ~ "Palaemonidae",
     common_name %in% c("Comb jelly", "Estuarine jellyfish", "Crangon sp.", "unid fish", "Bass unknown", "Lamprey unknown", "No catch") ~ "Other",
     TRUE ~ "Other"
-  )) |> 
+  )) 
 # mutate(sample_date = as.Date(sample_date, format = "%Y-%d-%m"))
-   mutate(sample_date = parse_date_time(sample_date, orders = c("mdy", "dmy", "ymd", "my", "dmy"))) |> 
-  mutate(sample_date = as.Date(sample_date))
+   
 
 
 ```
+
+# set color palette
+```{r}
+
+my_palette <- c("red3", "#772d26", "#a85fb4", "#42348b", "#a8734a", "#85d4dc", "#bdcc17", "#92df87",
+             "#559e4a", "blue3", "#f7d875", "#bbbfdd", "#808080", "orange2")
+
+
+```
+
 
 
 visualize
@@ -129,7 +134,8 @@ x = site
 ggplot(data = fish_result, aes(x = location, y = sample_date, fill = max_catch_fam)) +
   geom_col() + 
   scale_x_discrete(expand = c(0,NA)) +
-  scale_y_date(expand = c(0, NA), date_breaks = "2 months") +
+  scale_y_date(expand = c(0,NA)) +
+  scale_fill_manual(values = my_palette) +
   labs(
     title = "Most Caught Organisms by Sample Date",
     subtitle = "Organism is Categorized by Family",
@@ -137,19 +143,45 @@ ggplot(data = fish_result, aes(x = location, y = sample_date, fill = max_catch_f
     x = "Sample Location"
   ) +
   theme_bw() 
-  
-  
-
-
+  # theme(
+  #   # figure out how to do y axis labels!!
+  # #   axis.text.y = element_blank(),
+  # #   axis.ticks.y = element_blank()
+  # )
+  # 
 
 
 ```
 
-
-### code not working, attempt a reprex 
+# make a reprex for my error issue!
 
 ```{r}
+library(reprex)
+
+fish_clean_reprex <- data.frame(location = c("A", "A", "B", "B"),
+                         sample_date = c("01/01/2020", "01/01/2020", "02/01/2020", "02/01/2020"),
+                         common_name = c("American Shad", "Striped Bass", "Delta Smelt", "Pacific Herring"))
+
+fish_max_reprex <- fish_clean_reprex |> 
+  mutate(sample_date = mdy(sample_date)) |> 
+  group_by(location, sample_date, common_name) |> 
+  summarize(max_catch = n(), .groups = "drop")
+
+fish_top_reprex <- fish_max_reprex |> 
+  group_by(location, sample_date) |> 
+  summarize(highest_total = max(max_catch), .groups = "drop")
+
+fish_result_reprex <- fish_max_reprex |> 
+  inner_join(fish_top_reprex, by = c("location", "sample_date", "max_catch" = "highest_total")) |> 
+  mutate(max_catch_fam = case_when(
+    common_name %in% c("American Shad", "Delta Smelt", "Pacific Herring") ~ "Fish",
+    common_name %in% c("Striped Bass") ~ "Bass"))
+
+ggplot(data = fish_result_reprex, aes(x = location, y = sample_date, fill = max_catch_fam)) +
+  geom_col() +
+  scale_y_date(expand = c(0,NA), date_breaks = "1 month")
+
+
 
 ```
-
 

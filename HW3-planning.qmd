@@ -33,7 +33,7 @@ Have fish/organism catches at each site changed over time?
 
 Sub-questions: 
 What is the most caught organism at each site over time?
-What is the amount of unique catch types of organisms over time by site?
+What is the amount of unique catch types of organisms (over time?) by site?
 What are the abiotic differences between each site? (water temp, weather, location, etc)
 
 
@@ -112,6 +112,14 @@ fish_result$sample_date = as.Date(fish_result$sample_date, format = "%m, %d, %y"
 
 ```
 
+```{r}
+unique(class(fish_result$sample_date))
+sum(is.na(fish_result$sample_date))
+length(fish_result$sample_date)
+
+```
+
+
 # set color palette
 ```{r}
 
@@ -126,26 +134,28 @@ my_palette <- c("red3", "#772d26", "#a85fb4", "#42348b", "#a8734a", "#85d4dc", "
 visualize
 
 stacked bar plot 
-y = time
-x = site
+x = time
+y = site
 
 ```{r}
 
-ggplot(data = fish_result, aes(x = location, y = sample_date, fill = max_catch_fam)) +
+ggplot(data = fish_result, aes(x = sample_date, y = location, fill = max_catch_fam)) +
   geom_col() +
-  scale_x_discrete(expand = c(0,NA)) +
-   scale_y_date(#expand = as.Date(c('2002','2025')), 
-                date_breaks = "1 year", 
-             limits = as.Date(c('2002-01-02', '2024-07-31')), 
-                label = year) +
-  scale_fill_manual(values = my_palette) +
+   scale_y_discrete(expand = c(0,NA)) +
+   # scale_x_date(expand = as.Date(c('2002','2025')),
+   #              date_breaks = "1 year",
+   #           limits = as.Date(c('2002-01-02', '2024-07-31')),
+   #              labels = year
+   #           ) +
+   scale_fill_manual(values = my_palette) +
   labs(
     title = "Most Caught Organisms by Sample Date",
     subtitle = "Organism is Categorized by Family",
-    y = "Sample Date",
-    x = "Sample Location"
+    x = "Sample Date",
+    y = "Sample Location"
   ) +
   theme_bw() 
+# + facet_wrap(~location)
   # theme(
   #   # figure out how to do y axis labels!!
   # #   axis.text.y = element_blank(),
@@ -186,8 +196,8 @@ ggplot(data = fish_result_reprex, aes(x = location, y = sample_date, fill = max_
     scale_x_discrete(expand = c(0,NA)) +
   scale_fill_manual(values = my_palette) +
   labs(
-    title = "Most Caught Organisms by Sample Date",
-    subtitle = "Organism is Categorized by Family",
+    title = "Most Caught Marine Species by Sample Date",
+    subtitle = "Animals are Categorized by Family",
     y = "Sample Date",
     x = "Sample Location"
   ) +
@@ -196,4 +206,154 @@ ggplot(data = fish_result_reprex, aes(x = location, y = sample_date, fill = max_
 
 
 ```
+
+
+#### I'm way too frustrated with max catch type, let's move on
+
+## What is the amount of unique catch types of organisms by site?
+
+would be cool to make in the shape of fish or somehow water related
+
+```{r}
+fish_unique <- fish_clean |> 
+  select(location, common_name, sample_date) |> 
+  group_by(location) |> 
+  summarize(nunique = n_distinct(common_name)) 
+
+ggplot(data = fish_unique, aes(x = location, y = nunique)) +
+  geom_col(color = "blue3", fill = "navy", width = 1) +
+  geom_text(aes(label = nunique, 
+                vjust = 4), 
+            color = "white", 
+            size = 5,
+            family = "outfit") +
+  theme_bw() +
+  scale_x_discrete(expand = c(0, NA)) +
+  scale_y_continuous(expand = c(0, NA), limits = c(0, 80)) +
+  labs(
+    title = "Number of Unique Species Caught at Each Location"
+  ) +
+  theme(
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    # I anticipate changing the style of the title in affinity so I'll leave it for now
+    title = element_text(family = "outfit"),
+    axis.text = element_text(family = "outfit",
+                             size = 12),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank(),
+    axis.ticks = element_blank(),
+    axis.text.y = element_blank()
+    
+  )
+
+
+
+```
+
+```{r}
+library(showtext)
+library(fontawesome)
+# can't find some of the fonts
+
+
+#font_add_google(name = "Rubik Puddles", family = "puddles")
+#font_add_google(name = "Rubik Glitch", family = "glitch")
+font_add_google(name = "Flavors", family = "flavors")
+#font_add_google(name = "DynaPuff", family = "dynapuff")
+#font_add_google(name = "Rubik Vinyl", family = "vinyl")
+font_add_google(name = "Outfit", family = "outfit")
+
+font_add(family = "fa-solid",
+         regular = here::here("fonts", "Font Awesome 6 Free-Solid-900.otf"))
+
+showtext_auto()
+```
+
+
+
+question 3: What are the abiotic differences between each site? 
+plan: x and y are lat long (need to join locals dataframe)
+scatter plot with color = avg. water temp at each site
+shape = avg. weather at each site (have shape be the shape of weather ie. sun, cloud, rain cloud, etc)
+ 
+
+wrangling
+```{r}
+locals_sites <- locals |> 
+  filter(Location == c("Chipps Island", "Benicia", "Mossdale", "Sherwood Harbor")) |> 
+  select(Location, Latitude, Longitude) |> 
+  clean_names()
+
+fish_abiotic <- fish_clean |> 
+  select(location, weather_code, water_temp) |> 
+  na.omit(water_temp, weather_code) 
+  
+
+fish_water <- fish_abiotic |> 
+  group_by(location) |> 
+  summarize(avg_water_temp = mean(water_temp)) 
+
+fish_weather <- fish_abiotic |> 
+  group_by(location) |> 
+  summarize(weather = DescTools::Mode(weather_code))
+
+fish_join <- fish_weather |> 
+  full_join(fish_water, join_by(location)) 
+
+local_join <- fish_join |> 
+  full_join(locals_sites, join_by(location)) 
+
+```
+
+plot 
+*I will overlay a map on this to show the location of each site*
+```{r}
+sun_shape <- '&#xf185'
+
+ggplot(data = local_join, aes(y = latitude, x = longitude, color = avg_water_temp)) +
+  geom_point(size = 3) +
+  # geom_text(label = sun_shape, size = 6) 
+labs(
+  title = "Differences Between Sites",
+  subtitle = "Average weather is the same, but water temperature differs",
+  color = "Avg. Water Temp"
+) +
+  theme_bw() +
+  theme(
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank(),
+    title = element_text(family = "outfit",
+                         size = 15),
+    legend.text = element_text(family = "outfit"),
+    legend.position = "left"
+  ) 
+```
+
+7. Answer the following questions:
+
+
+a. What challenges did you encounter or anticipate encountering as you continue to build / iterate on your visualizations in R? If you struggled with mocking up any of your three visualizations (from #6, above), describe those challenges here.
+
+I struggled A LOT with the axis for date in my first visualization. I couldn't figure out how to make the scale what I wanted it to be and make it legible. Without figuring out that step, I couldn't continue working on the finer details of my plot and making it make sense. I want to eventually add annotations to my plot, but it's difficult if I can't even see the axes.
+
+I also struggled with font awesome. I wanted to change the shape of my last scatter plot dots to a sun to represent the average weather at each location. I tried a bunch of methods, but couldn't quite figure out how to add them in R. 
+
+
+b. What ggplot extension tools / packages do you need to use to build your visualizations? Are there any that we haven’t covered in class that you’ll be learning how to use for your visualizations?
+
+I'm using `showtext()` for my fonts, and would like to eventually use `ggforce` for cool annotations. I also used `scales` in my plots. To do the wrangling I used `DescTools` to find the mode weather at each site, which is something I don't believe we've talked about in class.
+
+
+c. What feedback do you need from the instructional team and / or your peers to ensure that your intended message is clear?
+
+
+My first plot is definitely my messiest, so I would love any feedback about how to make it clearer/ change my plots. I also want to make sure that the overarching question of "Are Marine Species Changing in the San Francisco Estuary?" is clear. I might have to change the question to something about changes throughout the estuary instead of throughout time. Feedback on the ~vibes~ of the infographic would also be great. I'm going for very playful and water themed. And please feel free to help me with any of the code I'm stuck on! 
+
 

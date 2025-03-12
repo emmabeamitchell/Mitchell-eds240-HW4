@@ -108,7 +108,7 @@ fish_result <- fish_max |>
   )) 
  # mutate(sample_date = as.Date(sample_date, format = "%m, %d, %y"))
    
-fish_result$sample_date = as.Date(fish_result$sample_date, format = "%m, %d, %y") 
+# fish_result$sample_date = as.Date(fish_result$sample_date, format = "%m, %d, %y") 
 
 ```
 
@@ -140,13 +140,13 @@ y = site
 ```{r}
 
 ggplot(data = fish_result, aes(x = sample_date, y = location, fill = max_catch_fam)) +
-  geom_col() +
+  geom_bar(stat = "identity") +
    scale_y_discrete(expand = c(0,NA)) +
-   # scale_x_date(expand = as.Date(c('2002','2025')),
-   #              date_breaks = "1 year",
-   #           limits = as.Date(c('2002-01-02', '2024-07-31')),
-   #              labels = year
-   #           ) +
+   scale_x_date(expand = as.Date(c('2002','2025')),
+                date_breaks = "1 year",
+             limits = as.Date(c('02-01-2022', '07-31-2024')),
+                labels = year
+             ) +
    scale_fill_manual(values = my_palette) +
   labs(
     title = "Most Caught Organisms by Sample Date",
@@ -191,7 +191,7 @@ fish_result_reprex <- fish_max_reprex |>
     common_name %in% c("Striped Bass") ~ "Bass"))
 
 ggplot(data = fish_result_reprex, aes(x = location, y = sample_date, fill = max_catch_fam)) +
-  geom_col() +
+  geom_bar(stat = "identity") +
   scale_y_date(date_breaks = "1 day", limits = as.Date(c("2020-01-01", "2020-01-02"))) +
     scale_x_discrete(expand = c(0,NA)) +
   scale_fill_manual(values = my_palette) +
@@ -218,15 +218,20 @@ would be cool to make in the shape of fish or somehow water related
 fish_unique <- fish_clean |> 
   select(location, common_name, sample_date) |> 
   group_by(location) |> 
-  summarize(nunique = n_distinct(common_name)) 
+  summarize(nunique = n_distinct(common_name)) |> 
+  mutate(location = fct_reorder(location, nunique))
 
-ggplot(data = fish_unique, aes(x = location, y = nunique)) +
-  geom_col(color = "blue3", fill = "navy", width = 1) +
+
+
+
+water_plot <- ggplot(data = fish_unique, aes(x = location, y = nunique)) +
+  geom_col(fill = "navy", width = 1) +
   geom_text(aes(label = nunique, 
                 vjust = 4), 
             color = "white", 
             size = 5,
             family = "outfit") +
+  geom_vline(xintercept = c(1,2,3,4) , color = "blue3", linetype = "dashed") +
   theme_bw() +
   scale_x_discrete(expand = c(0, NA)) +
   scale_y_continuous(expand = c(0, NA), limits = c(0, 80)) +
@@ -248,10 +253,22 @@ ggplot(data = fish_unique, aes(x = location, y = nunique)) +
     axis.text.y = element_blank()
     
   )
+water_plot
 
-
+ggsave(
+  filename = here::here("images", "water_bar_factor.pdf"),
+  plot = water_plot,
+  device = "pdf",
+  width = 14, 
+  height = 12,
+  unit = "in",
+  dpi = 300,
+  scale = 0.6
+)
 
 ```
+
+
 
 ```{r}
 library(showtext)
@@ -316,6 +333,7 @@ sun_shape <- '&#xf185'
 ggplot(data = local_join, aes(y = latitude, x = longitude, color = avg_water_temp)) +
   geom_point(size = 3) +
   # geom_text(label = sun_shape, size = 6) 
+  scale_color_viridis_c(name = "Avg. Water Temp." , option = "plasma") +
 labs(
   title = "Differences Between Sites",
   subtitle = "Average weather is the same, but water temperature differs",
@@ -355,5 +373,11 @@ c. What feedback do you need from the instructional team and / or your peers to 
 
 
 My first plot is definitely my messiest, so I would love any feedback about how to make it clearer/ change my plots. I also want to make sure that the overarching question of "Are Marine Species Changing in the San Francisco Estuary?" is clear. I might have to change the question to something about changes throughout the estuary instead of throughout time. Feedback on the ~vibes~ of the infographic would also be great. I'm going for very playful and water themed. And please feel free to help me with any of the code I'm stuck on! 
+
+
+
+
+
+possible ideas for question 1:
 
 

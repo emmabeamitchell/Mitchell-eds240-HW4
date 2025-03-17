@@ -1,13 +1,31 @@
 ---
 title: "blog post"
-author: "Emma Bea"
+author: "Emma Bea Mitchell"
 format: html
 ---
-
 San Francisco is a place I've been to many times, but never thought in-depth about the environment and ecosystem there. When I saw the dataset about fish in the estuary, I chose it simply because the data seemed clean and easy to wrangle. It wasn't until I began designing the infographic that I became very intrigued by the information I could display. I learned about the intentionality of the sample sites, and the meaning behind the abiotic features and fish species caught at each location. 
 
-I always love making data visualizations as fun as possible. Data can often feel very serious and dry, and I like to challenge myself to change that narrative, hence my colorful and playful themes I went with in this graphic. Here are some elements that I thought about in my infographic:
 
+My data came from 
+
+
+
+Overarching questions: 
+How do fish and other marine species catches differ between sites in the San Francisco Estuary?
+
+Sub-questions: 
+
+- What are the top three most caught marine organisms at each site?
+
+- How many unique marine organisms were sampled at each site?
+
+- What are the abiotic differences between each site? (water temp, weather, location, etc)
+
+
+
+
+
+I always love making data visualizations as fun as possible. Data can often feel very serious and dry, and I like to challenge myself to change that narrative, hence my colorful and playful themes I went with in this graphic. Here are some elements that I thought about in my infographic:
 
 1. graphic form 
 
@@ -49,4 +67,168 @@ I considered accessibility be making the palette colorblind friendly and adding 
 10. applying a DEI lens to your design, as appropriate (e.g. considering the people / communities / places represented in your data, consider how you frame your questions / issue)
 
 I thought about people that live and have lived in the area and how they are and were effected. This was something I made sure to mention, as even an infographic more about ecology, still affects people and communities. 
+
+```{r}
+#| quiet: true
+#| output: false
+
+# load libraries
+library(tidyverse)
+library(here)
+library(janitor)
+library(ggtext)
+library(showtext)
+
+# add Google fonts
+font_add('fa-reg', 'fonts/Font Awesome 6 Free-Regular-400.otf')
+font_add('fa-brands', 'fonts/Font Awesome 6 Brands-Regular-400.otf')
+font_add('fa-solid', 'fonts/Font Awesome 6 Free-Solid-900.otf')
+
+font_add_google(name = "Flavors", family = "flavors")
+font_add_google(name = "Outfit", family = "outfit")
+
+showtext_auto()
+
+# load data
+fish_02_24 <- read_csv(here("data", "2002-2024_DJFMP_trawl_fish_and_water_quality_data.csv"))
+locals <- read_csv(here("data", "DJFMP_Site_Locations.csv"))
+
+# clean data
+fish_clean <- fish_02_24 |> 
+  clean_names() |> 
+  select_if(~ sum(is.na(.)) < 750000)
+
+# find unique common names by location
+fish_unique <- fish_clean |> 
+  select(location, common_name, sample_date) |> 
+  group_by(location) |> 
+  summarize(nunique = n_distinct(common_name)) 
+
+# plot amount of unique species per location
+unique_plot <- ggplot(data = fish_unique, aes(x = location, y = nunique)) +
+  geom_col(color = "blue3", fill = "navy", width = 1) +
+  geom_text(aes(label = nunique, 
+                vjust = 4), 
+            color = "white", 
+            size = 5,
+            family = "outfit") +
+  theme_bw() +
+  scale_x_discrete(expand = c(0, NA)) +
+  scale_y_continuous(expand = c(0, NA), limits = c(0, 80)) +
+  labs(
+    title = "Number of Unique Species Caught at Each Location"
+  ) +
+  theme(
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    # I anticipate changing the style of the title in affinity so I'll leave it for now
+    title = element_text(family = "outfit"),
+    axis.text = element_text(family = "outfit",
+                             size = 12),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank(),
+    axis.ticks = element_blank(),
+    axis.text.y = element_blank())
+
+# filter for only the sites in the fish_clean dataset, and select only long and lat
+locals_sites <- locals |> 
+  filter(Location == c("Chipps Island", "Benicia", "Mossdale", "Sherwood Harbor")) |> 
+  select(Location, Latitude, Longitude) |> 
+  clean_names()
+
+# select only needed columns for question
+fish_abiotic <- fish_clean |> 
+  select(location, weather_code, water_temp) |> 
+  na.omit(water_temp, weather_code) 
+  
+# find average water temp by location
+fish_water <- fish_abiotic |> 
+  group_by(location) |> 
+  summarize(avg_water_temp = mean(water_temp)) 
+
+# find average (mode) weather by location
+fish_weather <- fish_abiotic |> 
+  group_by(location) |> 
+  summarize(weather = DescTools::Mode(weather_code))
+
+# join all datasets together
+fish_join <- fish_weather |> 
+  full_join(fish_water, join_by(location)) 
+
+local_join <- fish_join |> 
+  full_join(locals_sites, join_by(location)) 
+
+# plot scatter plot with color as water temperature
+temp_plot <- ggplot(data = local_join, aes(y = latitude, x = longitude, color = avg_water_temp, label = "<span style='font-family:fa-solid;'>&#xf2c8;</span>")) +
+ # geom_point(size = 10) +
+  geom_richtext(size = 60, label.colour = NA, fill = NA) +
+  scale_color_gradient(low = "navy",
+                       high = "red") +
+labs(
+  title = "Temperatures Differ Across Sampling Sites",
+  subtitle = "Average temperature changes up to ten degress between sites",
+  color = "Avg. Water Temp (°C)"
+) +
+  theme_bw() +
+  theme(
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank(),
+    title = element_text(family = "outfit",
+                         size = 15),
+    legend.text = element_text(family = "outfit"),
+    legend.position = "left"
+  ) 
+
+# Calculate the catch count for each common_name
+fish_max <- fish_clean |> 
+  group_by(location, common_name) |> 
+  summarize(max_catch = n(), .groups = "drop") 
+
+
+# Find the top three highest catches for each location
+fish_top <- fish_max |> 
+  filter(common_name != "No catch") |> 
+  arrange(desc(max_catch)) |> 
+  group_by(location) |> 
+  slice(1:3) 
+
+# plot top three catch types by site
+fish_top_three <- ggplot(data = fish_top, aes(fill = common_name, x = location, y = max_catch)) +
+  geom_bar(position = "fill", stat = "identity", width = .7) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(fill = "Common Names") +
+  # this isn't working with a filled bar chart, I'll just add labels in affinity
+ # geom_text(aes(label = max_catch)) +
+  theme(
+    axis.title = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank(),
+    legend.text = element_text(family = "outfit"),
+    axis.text = element_text(family = "outfit")
+  ) +
+  coord_flip()
+
+print(fish_top_three)
+
+ggsave(
+  filename = here::here("images", "top_catch.pdf"),
+  plot = fish_top_three,
+  device = "pdf",
+  width = 14, 
+  height = 12,
+  unit = "in",
+  dpi = 300,
+  scale = 0.6
+)
+```
 

@@ -1,67 +1,94 @@
 ---
-title: "Marine Species in the San Francisco Estuary"
-author: "Emma Bea"
+title: "Fish in the San Francisco Estuary"
+subtitle: "Creating an infographic, and what I learned along the way"
+author: "Emma Bea Mitchell"
 format: html
 ---
+I've been to San Francisco numerous times, seeing the Painted Ladies, going to Alcatraz, even walking across the Golden Gate Bridge, but creating this infographic made me see the city and its surrounding area in a whole new light. I became entranced with the vast ecosystem of the Sacramento and San Joaquin Rivers, the Delta, and the bays; the people that rely on the water across California; and the grand efforts to save the Chinook Salmon through management practices I had never even considered before. The next time I'm in San Francisco, I will not only being looking up at the wonders above ground, but down to try and catch a glance at the fish that are competing for survival in a world of their own. 
 
-San Francisco is a place I've been to many times, but never thought in-depth about the environment and ecosystem there. When I saw the dataset about fish in the estuary, I chose it simply because the data seemed clean and easy to wrangle. It wasn't until I began designing the infographic that I became very intrigued by the information I could display. I learned about the intentionality of the sample sites, and the meaning behind the abiotic features and fish species caught at each location. 
+My data for this infographic comes from the [Interagency Ecological Program: Over four decades of juvenile fish monitoring data from the San Francisco Estuary, collected by the Delta Juvenile Fish Monitoring Program, 1976-2024](https://portal.edirepository.org/nis/mapbrowse?scope=edi&identifier=244 ), which is the result of a program from the United States Fish and Wildlife Service.  
 
-My data comes from "Interagency Ecological Program: Over four decades of juvenile fish monitoring data from the San Francisco Estuary, collected by the Delta Juvenile Fish Monitoring Program, 1976-2024", which is the result of a program from the United States Fish and Wildlife Service. The data, as well as the metadata, can be found at this link https://portal.edirepository.org/nis/mapbrowse?scope=edi&identifier=244 
+When I originally picked this dataset, it was a simple choice. The data was easy to access, fairly clean, and I like fish right? But as I spent months wrangling, exploring, struggling, and eventually creating the plots used in my visualizations, I grew to have a deep love and an even deeper understanding of past mistakes that have led to invasive species taking root in the estuary, and the fight to protect native species like Chinook Salmon. 
 
-The question that my infographic is answering is *How do fish and other marine species catches differ between sites in the San Francisco Estuary?* I created three sub-questions, one for each plot. The first question is *What are the top three most caught marine organisms at each site?*, and I answered this question with a bar chart which I made look like fish. The second question is *How many unique marine organisms were sampled at each site?*, which I answered with a bar chart that I made into the shape of waves. The third question is *What is the average water temperature differences between each site?*, which I answered with a scatter plot with the color of the points representing the average temperature.
+My visualizations answer the questions: How do fish species catches differ between sites in the San Francisco Estuary?
+
+With three subquestions: 
+
+- What are the top three most commonly caught fish species at each site?
+
+- How many unique marine organisms were sampled at each site?
+
+- What is the average water temperature differences between each site?
 
 
 Here is how my infographic turned out!
 
-![](images/final_infographic_with_text.png){fig-alt="An infographic with the title: How do Fish and Other Marine Species Differ Throughout the San Francisco Estuary. The infographic contains three separate plots. The first plot is titled, the three most caught species at each site. The plot is a bar chart made into the shape of fish, where each bar is a different location (Benicia, Chipps Island, Sherwood Harbor, and Mossdale). The second plot is a bar chart titled, Number of Unique Species Caught at Each Location. These bars are made into the shape of waves, and each bar is from each location (Benicia, Chipps Island, Sherwood Harbor, and Mossdale). The third plot is a scatter plot titled, Temperatures Differ Across Sampling Sites. Each point is in the shape of a thermometer and is colored by temperature"}
+![](images/revised_infographic.png){fig-alt="An infographic with the title: How do Fish Species Differ Throughout the San Francisco Estuary. The infographic contains three separate plots. The first plot is titled, the three most commonly caught species at each site. The plot is a bar chart made into the shape of fish, where each bar is a different location (Benicia, Chipps Island, Sherwood Harbor, and Mossdale). The second plot is a bar chart titled, Number of Unique Species Caught at Each Location. These bars are made into the shape of waves, and each bar is from each location (Benicia, Chipps Island, Sherwood Harbor, and Mossdale). The third plot is a scatter plot titled, Temperatures Differ Across Sampling Sites. Each point is in the shape of a thermometer and is colored by temperature. The infographic describes efforts to help the Chinook Salmon, and how invasive species have become common in the area."}
 
+I always love making data visualizations as fun as possible. Data can often feel very serious and dry, and I like to challenge myself to change that narrative, hence my colorful and playful themes I went with in this graphic.
 
-
-I always love making data visualizations as fun as possible. Data can often feel very serious and dry, and I like to challenge myself to change that narrative, hence my colorful and playful themes I went with in this graphic. Here are some elements that I thought about in my infographic:
-
+Here are some elements that I thought about in my infographic:
 
 1. graphic form 
 
-I chose some very basic types of plots for my infographic. I only used a scatter plot and bar charts. I liked that these are extremely easy to read and interpret, but also have a lot of potential for customization.  
+In order to maximize the simplicity and ease of interpretation , I chose only very basic and common plot types for my infographic. Bar charts and scatter plots are not only easy for me to read, but also easier for me to edit in Affinity Designer. 
 
 2. text
 
-I chose to remove the axis labels from my plots, because I felt that the simplicity of the plots made them legible even without axis labels. I did add titles to every plot, but the most text this infographic has are annotations. I felt like the annotations was the most important part of the infographic, because it supplied some much needed context to the plots. Without them, the infographic does not tell such a detailed story of the importance of the San Francisco Estuary. 
+I chose to remove the axis labels from my plots because I felt that the simplicity of the plots made them legible even without them. I added titles to every plot in Affinity Designer to make it easier to place them in the exact locations I wanted. I also added annotations to infographic, which became an extremely important part of the visualizations. Without the annotations, the plots are cool but aren't telling much of a story. With them, I can connect the plots together and talk about Chinook Salmon and invasive species, which adds another layer to the entire infographic. 
 
 3. themes 
 
-In ggplot, I modified  the themes of all of the plots. I changed the width of my bar charts, the colors, the sizes of my points, and the shape of my points. I then transferred all of my work to affinity, where I added some major design elements like making one chart into the shape of waves and another into the shape of fish.
+In {ggplot2}, I modified  the themes of all of the plots. I changed the width of my bar charts, the colors, the sizes of my points, and the shape of my points. I then transferred all of my work to Affinity Designer, where I added some major design elements that changed the shape of the bar charts completely.
 
 4. colors
 
-I wanted my infographic to have playful and fun vibes, while still having colors that made sense. All of my palettes are colorblind friendly, and make sense for what they're visualizing. The wave chart is blue, and the thermometers have a blue to red palette. I had more fun with the colors of the fish, making them colorful and fun. 
+I wanted my infographic to have playful and fun vibes, while still having colors that made sense. All of my palettes are colorblind friendly, and make sense for what they're visualizing. The wave chart is blue, and the thermometers have a blue to red palette. I let myself be more creative with the colors of the fish, creating a palette that aesthetically worked with the rest of the visualizations and text. 
 
 5. typography
 
-I had so much fun with finding cool water and fish themed fonts online. I tested out a bunch of them, and decided that the font Wavepool and MV Boli matched my playful theme I was going for the most. I wanted it to look handwritten, while also staying very legible. 
+I had so much fun finding cool water and fish themed fonts online. I tested out a bunch of them, and decided that the font *Wavepool* and *MV Boli* matched my playful theme I was going for the most. I wanted it to look handwritten, while also staying very legible. 
 
 
 6. general design
 
-Because my plots were pretty minimal, I went a little crazier with the annotations. I used font thickness, size, color, and boxes around text to draw the eye to different elements. There is a lot of information, but I liked the vibe of that, and it was an intentional decision. Without the text that it has, the story of the infographic is very different and less meaningful. 
+Because my plots were pretty minimal, I went a little crazier with the annotations. I used font thickness, size, color, and boxes around text to draw the eye to different elements. Without the annotations, the story of the infographic is very different and less meaningful. 
 
-7. contextualizing your data
+7. contextualizing the data
 
-In boxes in bigger font I gave an overview of the estuary as a whole, and then gave context about individual sites and pointed to their locations through smaller unframed annotations. By doing this, I fit in a lot of information about the estuary and still managed to keep it aesthetically pleasing. 
+In a box in bigger font I connected all the plots together by mentioning fish species type and their environments. In the annotations I gave context about individual sites such as body of water they were on and explained the temperature differences. By doing this, I fit in a lot of information about the estuary and still managed to keep it aesthetically pleasing. 
 
-8. centering your primary message
+8. centering the primary message
 
-The primary message was to think about the ecosystem and environment of the estuary. I wanted to show the problems in the estuary such as invasive species, and also the reliance that humans and animals have on the estuary. I put this information in boxes and annotations around the graphic. 
+The primary message was to think about the ecosystem and environment of the estuary. I wanted to show the problems in the estuary such as invasive species, and also the efforts and struggles in saving the Chinook Salmon in the area. I put this information in boxes and annotations around the graphic. 
 
-9. considering accessibility (e.g. colorblind-friendly palettes / contrast, alt text)
+9. considering accessibility 
 
-I considered accessibility be making the palette colorblind friendly and adding alt text in the code to make it accesible to visually impaired users. 
+I considered accessibility be making the palette colorblind friendly and adding alt text in the code to make it accessible to visually impaired users. 
 
-10. applying a DEI lens to your design, as appropriate (e.g. considering the people / communities / places represented in your data, consider how you frame your questions / issue)
+10. applying a DEI lens
 
-I thought about people that live and have lived in the area and how they are and were effected. This was something I made sure to mention, as even an infographic more about ecology, still affects people and communities. 
+My plot doesn't directly talk about people, but I did try to stress the importance of preserving the native species in the area. I also wanted to make sure that I was considering cultural implications that could be associated with colors, font family, and designs. 
 
-If you're interested in the code behind this infographic, take a look below
+Additional sources that provided valuable information:
+
+[San Francisco Estuary Partnership, *About the Estuary*](https://www.sfestuary.org/our-estuary/about-the-estuary/)
+
+[California Department of Fish and Wildlife, *California Finfish and Shellfish Identification Book*](https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=39208)
+
+[Smithsonian Marine Invasions Lab, *Menidia audens*](https://invasions.si.edu/nemesis/species_summary/165993)
+
+[Smithsonian Marine Invasions Lab, *Alosa sapidissima*](https://invasions.si.edu/nemesis/species_summary/161702)
+
+[City of Lathrop CA, *Mossdale Village*](https://www.ci.lathrop.ca.us/planning/page/mossdale-village)
+
+[Williams, J. G., *Juvenile Chinook Salmon (Oncorhynchus tshawytscha) in and Around the San Francisco Estuary*](https://escholarship.org/uc/item/96f2t9xw)
+
+[Christine Parisek, UC Davis Center for Watershed Sciences, *Amazing Invader: American Shad*](https://californiawaterblog.com/2024/06/30/amazing-invader-american-shad/)
+
+[CA Department of Fish and Wildlife, *Winter-run Chinook Salmon*](https://wildlife.ca.gov/Conservation/Fishes/Chinook-Salmon/Winter-run)
+
+If you're interested in the code behind this infographic, take a look below!
 
 ```{r}
 #| output: false

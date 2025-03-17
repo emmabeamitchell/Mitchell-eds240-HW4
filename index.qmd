@@ -16,7 +16,7 @@ With three subquestions:
 
 - What are the top three most commonly caught fish species at each site?
 
-- How many unique marine organisms were sampled at each site?
+- How many unique marine species were sampled at each site?
 
 - What is the average water temperature differences between each site?
 
